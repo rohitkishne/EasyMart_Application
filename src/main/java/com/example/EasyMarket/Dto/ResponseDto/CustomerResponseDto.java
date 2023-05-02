@@ -1,0 +1,18 @@
+package com.example.EasyMarket.Dto.ResponseDto;
+
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@FieldDefaults(level= AccessLevel.PRIVATE)
+@Builder
+public class CustomerResponseDto {
+
+    String name;
+    String email;
+    Integer age;
+    String mobNo;
+    String address;
+}
