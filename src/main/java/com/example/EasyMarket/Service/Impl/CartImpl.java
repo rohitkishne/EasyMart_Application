@@ -9,16 +9,15 @@ import com.example.EasyMarket.Exception.CardIsNotValidException;
 import com.example.EasyMarket.Exception.CartIsEmptyException;
 import com.example.EasyMarket.Exception.CustomerIsNotFoundException;
 import com.example.EasyMarket.Exception.ProductIsNotFoundException;
-import com.example.EasyMarket.Repository.CardRepository;
-import com.example.EasyMarket.Repository.CartRepository;
-import com.example.EasyMarket.Repository.CustomerRepository;
-import com.example.EasyMarket.Repository.OrderRepository;
+import com.example.EasyMarket.Repository.*;
 import com.example.EasyMarket.Service.CartService;
 import com.example.EasyMarket.Service.OrderedService;
 import com.example.EasyMarket.Transformer.CartTransformer;
 import com.example.EasyMarket.Transformer.ItemTransformer;
 import com.example.EasyMarket.Transformer.OrderTransformer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -31,6 +30,8 @@ public class CartImpl implements CartService {
     CartRepository cartRepository;
 
     @Autowired
+    ItemRepository itemRepository;
+    @Autowired
     CustomerRepository customerRepository;
     @Autowired
     CardRepository cardRepository;
@@ -39,6 +40,8 @@ public class CartImpl implements CartService {
     OrderedService orderedService;
     @Autowired
     OrderRepository orderRepository;
+    @Autowired
+    private JavaMailSender emailSender;
     @Override
     public CartResponseDto addToCart(int customerId, Item itemSaved) {
 
@@ -138,6 +141,18 @@ public class CartImpl implements CartService {
 
             orderResponseDto.setItemList(items);
 
+            String text = "Order Detail : \n";
+            text = text + "Order Number : "+orderResponseDto.getOrderNo()+"\n";
+            text = text + "Order for : "+orderResponseDto.getCustomerName()+"\n";
+            text = text + "Total cost for Order : "+orderResponseDto.getTotalCost();
+
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom("projectpurposetesting@gmail.com");
+            message.setTo(cart.getCustomer().getEmail());
+            message.setSubject("Product Ordered");
+            message.setText(text);
+            emailSender.send(message);
+
             return orderResponseDto;
         }
         catch (Exception e)
@@ -145,6 +160,45 @@ public class CartImpl implements CartService {
             throw new ProductIsNotFoundException("Product are not available");
         }
 
+    }
+
+    @Override
+    public List<ItemResponseDto> viewAllItemInCart(int id) throws CustomerIsNotFoundException {
+
+        Cart cart;
+        try{
+            cart = cartRepository.findById(id).get();
+        }catch (Exception e)
+        {
+            throw new CustomerIsNotFoundException("Cart is not Exist");
+        }
+        List<Item> itemList= cart.getItems();
+        List<ItemResponseDto> viewCartItemDetail = new ArrayList<>();
+        for(Item item : itemList)
+        {
+            ItemResponseDto itemResponseDto = ItemTransformer.ItemToItemResponseDto(item);
+            viewCartItemDetail.add(itemResponseDto);
+        }
+
+        return viewCartItemDetail;
+    }
+
+    @Override
+    public String removeItemFromCart(int id) {
+
+        //get the item
+        Item item = itemRepository.findById(id).get();
+        Cart cart = item.getCart();
+
+        int remainingAmount = cart.getCartTotal() - item.getQuantity() * item.getProduct().getPrice();
+        cart.setCartTotal(remainingAmount);
+
+        int remainingItem = cart.getNumberOfItems() - item.getQuantity();
+        cart.setNumberOfItems(remainingItem);
+
+        itemRepository.delete(item);
+
+        return "Item from cart belongs to "+cart.getCustomer().getName()+" removed Successfully";
     }
 
     public void resetCart(Cart cart)

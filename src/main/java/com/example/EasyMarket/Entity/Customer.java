@@ -21,8 +21,10 @@ public class Customer {
     int id;
 
     String name;
+    @Column(unique = true)
     String email;
     Integer age;
+    @Column(unique = true, nullable = false)
     String mobNo;
     String address;
     @OneToMany(mappedBy="customer", cascade = CascadeType.ALL)

@@ -13,6 +13,8 @@ import com.example.EasyMarket.Service.ProductService;
 import com.example.EasyMarket.Transformer.ItemTransformer;
 import com.example.EasyMarket.Transformer.OrderTransformer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -34,6 +36,10 @@ public class OrderedImpl implements OrderedService {
     @Autowired
     ProductService productService;
 
+    @Autowired
+    JavaMailSender emailSender;
+
+    //Direct order
     @Override
     public OrderResponseDto placeOrder(OrderRequestDto orderRequestDto) throws CustomerIsNotFoundException, ProductIsNotFoundException, CardIsNotValidException {
         //check whether a customer is present or not
@@ -114,9 +120,22 @@ public class OrderedImpl implements OrderedService {
 
         orderResponseDto.setItemList(items);
 
+        String text = "Order Detail : \n";
+        text = text + "Order Number : "+orderResponseDto.getOrderNo()+"\n";
+        text = text + "Order for : "+orderResponseDto.getCustomerName()+"\n";
+        text = text + "Total cost for Order : "+orderResponseDto.getTotalCost();
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("projectpurposetesting@gmail.com");
+        message.setTo(customer.getEmail());
+        message.setSubject("Product Ordered");
+        message.setText(text);
+        emailSender.send(message);
+
         return orderResponseDto;
     }
 
+    //Order from cart
     @Override
     public Ordered placeOrder(Customer customer, Card card) throws ProductIsNotFoundException {
 

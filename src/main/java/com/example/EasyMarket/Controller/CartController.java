@@ -15,9 +15,9 @@ import com.example.EasyMarket.Service.ItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 public class CartController {
@@ -45,5 +45,16 @@ public class CartController {
     @PostMapping("/checkout")
     public OrderResponseDto checkOutCart(@RequestBody CheckoutCartRequestDto checkoutCartRequestDto) throws CardIsNotValidException, CustomerIsNotFoundException, CartIsEmptyException, ProductIsNotFoundException {
         return cartService.checkOutCart(checkoutCartRequestDto);
+    }
+
+    @GetMapping("/viewAllItemInCart")
+    public List<ItemResponseDto> viewAllItemInCart(@RequestParam int id) throws CustomerIsNotFoundException {
+        return cartService.viewAllItemInCart(id);
+    }
+
+    @DeleteMapping("/removeItemFromCart")
+    public String removeItemFromCart(@RequestParam int id)
+    {
+        return cartService.removeItemFromCart(id);
     }
 }
