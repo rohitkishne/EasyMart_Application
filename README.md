@@ -36,15 +36,15 @@
 * **Note - DbName should be same as created in MySQL**
 * Start the server by running an application
 * For sending **Real Time Emails on Customer Email-ID**, need some configuration that are given below :
-#### Configuration :
-* First import the Java Mail Sender Library in pom.XML file.
-* After importing, write some configuration line in application.properties inside resource folder of an application.
-* **spring.mail.host=smtp.gmail.com**
-* **spring.mail.port=587**
-* **spring.mail.username=......**
-* **spring.mail.password=......**
-* **spring.mail.properties.mail.smtp.auth=true**
-* **spring.mail.properties.mail.smtp.starttls.enable=true**
-### Note : Username and Password must be generated with respective Email-ID with App password that will find inside setting of respective Email-ID.
+  **Configuration :**
+    * First import the Java Mail Sender Library in pom.XML file.
+    * After importing, write some configuration line in application.properties inside resource folder of an application.
+    * **spring.mail.host=smtp.gmail.com**
+    * **spring.mail.port=587**
+    * **spring.mail.username=......**
+    * **spring.mail.password=......**
+    * **spring.mail.properties.mail.smtp.auth=true**
+    * **spring.mail.properties.mail.smtp.starttls.enable=true**
+* **_Note : Username and Password must be generated with respective Email-ID with App password that will find inside setting of respective Email-ID_.**
 
 **Note : It uses a `MySQL` as a database, `JavaMailSender Library` for Sending Real-Time Emails and  `Swagger Dependency` for APIs Documentation**
